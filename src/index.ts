@@ -8,8 +8,8 @@ const getdate = () => {
   return trending('weekly').then((responce) => responce)
 }
 
-export default (() => {
-  const data = getdate()
+export default async function main() {
+  const data = await getdate()
   axios({
     url: 'https://api.github.com/graphql',
     headers: {
@@ -31,4 +31,4 @@ export default (() => {
   })
     .then((res) => res.data)
     .then(console.log)
-})()
+}
