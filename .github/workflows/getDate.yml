@@ -1,0 +1,25 @@
+name: test
+
+on:
+  push: [master]
+
+jobs:
+  working-luvT-archive:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12.x]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@master
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: working luvT-archive!
+        run: |
+          yarn
+          yarn build
+        env:
+          TZ: Asia/Tokyo
+          GITHUB_ACCESS_TOKEN: ${{ secrets.GH_TOKEN }}
