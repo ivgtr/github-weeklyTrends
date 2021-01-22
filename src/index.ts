@@ -5,10 +5,14 @@ import trending from 'trending-github'
 dotenv.config()
 
 const getdate = () => {
-  return trending('weekly').then((responce) => responce)
+  return trending('weekly').then((responce) => {
+    return responce.map((item) => {
+      return item.language
+    })
+  })
 }
 
-export default async function main() {
+export default (async () => {
   const data = await getdate()
   axios({
     url: 'https://api.github.com/graphql',
@@ -18,8 +22,10 @@ export default async function main() {
     },
     method: 'POST',
     data: {
-      query: `mutation { 
-        createIssue(input:{title:"test2",repositoryId:"MDEwOlJlcG9zaXRvcnkzMzE4ODM4MTE=",body:"${data}"}) { 
+      query: `mutation {
+        createIssue(input:{title:"test2",repositoryId:"MDEwOlJlcG9zaXRvcnkzMzE4ODM4MTE=",body:"${data.join(
+          ','
+        )}"}) {
           clientMutationId,
           issue {
             body,
@@ -31,4 +37,4 @@ export default async function main() {
   })
     .then((res) => res.data)
     .then(console.log)
-}
+})()
