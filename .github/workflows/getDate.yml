@@ -1,7 +1,6 @@
 name: test
 
-on:
-  push: [master]
+on: push
 
 jobs:
   working-luvT-archive:
