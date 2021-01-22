@@ -1,23 +1,15 @@
 import dotenv from 'dotenv'
 import axios from 'axios'
+import trending from 'trending-github'
 
 dotenv.config()
 
-// const getdate = () => {
-//   new Promise((_resolve, _reject) =>
-//     axios
-//       .get(`https://github.com/trending/?since='daily'`, {
-//         headers: {
-//           Accept: 'text/html'
-//         }
-//       })
-//       .then((response) => {
-//         console.log(response)
-//       })
-//   )
-// }
+const getdate = () => {
+  return trending('weekly').then((responce) => responce)
+}
 
 export default (() => {
+  const data = getdate()
   axios({
     url: 'https://api.github.com/graphql',
     headers: {
@@ -27,7 +19,7 @@ export default (() => {
     method: 'POST',
     data: {
       query: `mutation { 
-        createIssue(input:{title:"test2",repositoryId:"MDEwOlJlcG9zaXRvcnkzMzE4ODM4MTE=",body:"uooooooooooooo${new Date().getTime()}"}) { 
+        createIssue(input:{title:"test2",repositoryId:"MDEwOlJlcG9zaXRvcnkzMzE4ODM4MTE=",body:"${data}"}) { 
           clientMutationId,
           issue {
             body,
