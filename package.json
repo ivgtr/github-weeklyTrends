@@ -1,11 +1,12 @@
 {
-  "name": "",
+  "name": "github-weekly-trends",
   "version": "0.0.1",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
     "start": "tsc -w",
-    "build": "ts-node ./src"
+    "dev": "node ./dist/index.js",
+    "workflow": "ts-node ./src"
   },
   "devDependencies": {
     "@types/node": "^14.14.22",
@@ -17,6 +18,7 @@
   "dependencies": {
     "@octokit/rest": "^18.0.14",
     "axios": "^0.21.1",
+    "dayjs": "^1.10.4",
     "dotenv": "^8.2.0",
     "trending-github": "^2.0.7"
   }
