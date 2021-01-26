@@ -1,8 +1,8 @@
-name: workflow get weekly GithubTrend!
+name: generate Issue
 
 on:
-  schedule:
-    - cron: "0 3 * * 1"
+  issues:
+    types: [opened]
 
 jobs:
   working-luvT-archive:
@@ -17,10 +17,20 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: workflow get weekly GithubTrend!
+      - name: generate Issue
         run: |
           yarn
-          yarn workflow
+          yarn generate
         env:
           TZ: Asia/Tokyo
           GITHUB_ACCESS_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: git setting
+        run: |
+          git config --local user.email "ivgtr.me@gmail.com"
+          git config --local user.name "ivgtr"
+      - name: commit & push
+        run: |
+          git add .
+          git commit -m "updating Weekly GitHub Trending!" -a
+          git pull
+          git push origin master
