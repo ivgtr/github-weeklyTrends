@@ -5,7 +5,7 @@ on:
     - cron: "0 3 * * 1"
 
 jobs:
-  working-luvT-archive:
+  working-get-GithubTrend:
     runs-on: ubuntu-latest
     strategy:
       matrix:

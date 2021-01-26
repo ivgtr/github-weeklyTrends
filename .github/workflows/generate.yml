@@ -5,7 +5,7 @@ on:
     types: [opened]
 
 jobs:
-  working-luvT-archive:
+  working-generate-readme:
     runs-on: ubuntu-latest
     strategy:
       matrix:
