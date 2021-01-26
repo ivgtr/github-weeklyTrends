@@ -6,7 +6,8 @@
   "scripts": {
     "start": "tsc -w",
     "dev": "node ./dist/index.js",
-    "workflow": "ts-node ./src"
+    "workflow": "ts-node --files ./src/index.ts",
+    "del:issue": "ts-node --files ./src/delIssue.ts"
   },
   "devDependencies": {
     "@types/node": "^14.14.22",
