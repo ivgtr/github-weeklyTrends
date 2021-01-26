@@ -74,7 +74,7 @@ const createIssue = (shapeDate: shapeRepository[]) => {
     method: 'POST',
     data: {
       query: `mutation {
-        createIssue(input:{title:"${title}",repositoryId:"MDEwOlJlcG9zaXRvcnkzMzE4ODM4MTE=",body:"${issueBody}"}) {
+        createIssue(input:{title:"${title}",repositoryId:"MDEwOlJlcG9zaXRvcnkzMzE4ODM4MTE=",labelIds:"MDU6TGFiZWwyNjg3OTE1Nzgy",body:"${issueBody}"}) {
           issue {
             body,
             id
