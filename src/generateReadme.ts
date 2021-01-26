@@ -14,7 +14,7 @@ const headers = {
 const createReadme = (newIssueData: { title: string; number: number }) => {
   const body = `<div align="center">
   <h3 align="center">github-weekly-trends</h3>
-  <p align="center">Get Github weekly trens, and output Issue in this repository.</p>
+  <p align="center">Get Github weekly trends, and output Issue in this repository.</p>
   <a align="center" href="https://github.com/ivgtr/github-weeklyTrends/issues/${newIssueData.number}" target="_brank">${newIssueData.title}</a>
 </div>\n
 ## License\n
