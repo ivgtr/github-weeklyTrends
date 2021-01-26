@@ -11,42 +11,51 @@ const headers = {
   Accept: 'application/vnd.github.v4.idl'
 }
 
+const createCommentIssueBody = (repositorys: shapeRepository): string => {
+  let body = `## ${repositorys.language || 'unknown'}\n`
+
+  repositorys.repositorys.map((repo) => {
+    body += `### [${repo.author}](https://github.com/${repo.author}) / __[${repo.name}](${
+      repo.href
+    })__\n${repo.description || 'Not description.'}\n\nFork:${repo.forks} / Star:${repo.stars} / ${
+      repo.starsInPeriod
+    } stars this week\n\n`
+  })
+
+  return body
+}
+
 const commentIssue = async (repositorys: shapeRepository[], issueId: string) => {
-  await Promise.all(repositorys.map((repo) => {
-    axios({
+  for (const repo of repositorys) {
+    const issueCommentBody = createCommentIssueBody(repo)
+    await axios({
       url,
       headers,
       method: 'POST',
       data: {
         query: `mutation {
-        createIssue(input:{title:"${title}",repositoryId:"MDEwOlJlcG9zaXRvcnkzMzE4ODM4MTE=",body:"${issueBody}"}) {
-          clientMutationId,
-          issue {
-            body,
-            id
-          }
-        }
-      }`
+            addComment(input:{subjectId:"${issueId}",body:"${issueCommentBody}"}) {
+              clientMutationId
+            }
+          }`
       }
     })
-      .then((res) => {
-        return res.data.reateIssue.issue.id
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  })
+  }
+  console.log('complete')
 }
 
-
-const createIssueBody = (repositorys: shapeRepository[], title: string): string => {
+const createIssueBody = (repositorys: shapeRepository, title: string): string => {
   let body = `# ${title}\n`
-  body += `## ${repositorys[0].language || 'unknown'}\n`
+  body += `## ${repositorys.language || 'unknown'} trending ${
+    repositorys.repositorys.length
+  }repo's\n`
 
-  repositorys[0].repositorys.map((repo) => {
-    body += `### [${repo.name}](${repo.href}) / [${repo.author}](https://github.com/${
-      repo.author
-    })\n${repo.description || 'Not description.'}\nFork:${repo.forks} / Star:${repo.stars}\n\n`
+  repositorys.repositorys.map((repo) => {
+    body += `### [${repo.author}](https://github.com/${repo.author}) / __[${repo.name}](${
+      repo.href
+    })__\n${repo.description || 'Not description.'}\n\nFork:${repo.forks} / Star:${repo.stars} / ${
+      repo.starsInPeriod
+    } stars this week\n\n`
   })
 
   return body
@@ -57,9 +66,7 @@ const createIssue = (shapeDate: shapeRepository[]) => {
   const title = `Weekly GitHub Trending! (${day.format('YYYY/MM/DD')} ~ ${day
     .subtract(1, 'week')
     .format('YYYY/MM/DD')})`
-  const issueBody = createIssueBody(shapeDate, title)
-
-  console.log(issueBody)
+  const issueBody = createIssueBody(shapeDate[0], title)
 
   return axios({
     url,
@@ -68,7 +75,6 @@ const createIssue = (shapeDate: shapeRepository[]) => {
     data: {
       query: `mutation {
         createIssue(input:{title:"${title}",repositoryId:"MDEwOlJlcG9zaXRvcnkzMzE4ODM4MTE=",body:"${issueBody}"}) {
-          clientMutationId,
           issue {
             body,
             id
@@ -78,7 +84,7 @@ const createIssue = (shapeDate: shapeRepository[]) => {
     }
   })
     .then((res) => {
-      return res.data.reateIssue.issue.id
+      return res.data.data.createIssue.issue.id
     })
     .catch((err) => {
       console.log(err)
@@ -105,5 +111,6 @@ const getShapeData = (trendData: Repository[]) => {
 export const createReport = async (trendData: Repository[]) => {
   const shapeData = await getShapeData(trendData)
   const issueId = await createIssue(shapeData)
-  await commentIssue(shapeData.shift(), issueId as string)
+  const shiftShapeData = shapeData.slice(1, 100)
+  await commentIssue(shiftShapeData, issueId as string)
 }
