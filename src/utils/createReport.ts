@@ -15,9 +15,9 @@ const createCommentIssueBody = (repositorys: shapeRepository): string => {
   let body = `## ${repositorys.language || 'unknown'}\n`
 
   repositorys.repositorys.map((repo) => {
-    body += `### [${repo.author}](https://github.com/${repo.author}) / __[${repo.name}](${
+    body += `### [${repo.author}](https://github.com/${repo.author}) / [${repo.name}](${
       repo.href
-    })__\n${repo.description || 'Not description.'}\n\nFork:${repo.forks} / Star:${repo.stars} / ${
+    })\n${repo.description || 'Not description.'}\n\nFork:${repo.forks} / Star:${repo.stars} / +${
       repo.starsInPeriod
     } stars this week\n\n`
   })
@@ -51,9 +51,9 @@ const createIssueBody = (repositorys: shapeRepository, title: string): string =>
   }repo's\n`
 
   repositorys.repositorys.map((repo) => {
-    body += `### [${repo.author}](https://github.com/${repo.author}) / __[${repo.name}](${
+    body += `### [${repo.author}](https://github.com/${repo.author}) / [${repo.name}](${
       repo.href
-    })__\n${repo.description || 'Not description.'}\n\nFork:${repo.forks} / Star:${repo.stars} / ${
+    })\n${repo.description || 'Not description.'}\n\nFork:${repo.forks} / Star:${repo.stars} / +${
       repo.starsInPeriod
     } stars this week\n\n`
   })
