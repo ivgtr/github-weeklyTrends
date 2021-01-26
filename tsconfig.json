@@ -17,7 +17,7 @@
     "rootDir": "./src",
     "baseUrl": "./",
     "outDir": "./dist",
-    "noEmitOnError": true,
+    "noEmitOnError": false,
     "resolveJsonModule": true
   },
   "include": [
