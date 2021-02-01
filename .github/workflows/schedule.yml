@@ -1,6 +1,8 @@
 name: workflow get weekly GithubTrend!
 
-on: push
+on:
+  schedule:
+    - cron: "0 3 * * 1"
 
 jobs:
   working-get-GithubTrend:
@@ -22,13 +24,3 @@ jobs:
         env:
           TZ: Asia/Tokyo
           GITHUB_ACCESS_TOKEN: ${{ secrets.GH_TOKEN }}
-      - name: git setting
-        run: |
-          git config --local user.email "ivgtr.me@gmail.com"
-          git config --local user.name "ivgtr"
-      - name: commit & push
-        run: |
-          git add .
-          git commit -m "updating Weekly GitHub Trending!" -a
-          git pull
-          git push origin master

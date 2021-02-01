@@ -11,11 +11,11 @@ const headers = {
   Accept: 'application/vnd.github.v4.idl'
 }
 
-const createReadme = (newIssueData: { number: number }, title: string) => {
+const createReadme = (newIssueData: { number: number; title: string }) => {
   const body = `<div align="center">
   <h3 align="center">github-weekly-trends</h3>
   <p align="center">Get Github weekly trends, and output Issue in this repository.</p>
-  <a align="center" href="https://github.com/ivgtr/github-weeklyTrends/issues/${(newIssueData.number += 1)}" target="_brank">${title}</a>
+  <a align="center" href="https://github.com/ivgtr/github-weeklyTrends/issues/${newIssueData.number}" target="_brank">${newIssueData.title}</a>
 </div>\n
 ## License\n
 MIT ©[ivgtr](https://github.com/ivgtr)\n
@@ -24,7 +24,7 @@ MIT ©[ivgtr](https://github.com/ivgtr)\n
   fs.writeFileSync('README.md', body)
 }
 
-export const generateReadme = async (title: string) => {
+export default (async () => {
   try {
     const newIssueData: { title: string; number: number }[] = await axios({
       url,
@@ -33,9 +33,10 @@ export const generateReadme = async (title: string) => {
       data: {
         query: `query {
           repository(owner:"ivgtr",name:"github-weeklyTrends"){
-            issues(first:1){
+            issues(last:1){
               nodes{
-                number
+                number,
+                title
               }
             }
           }
@@ -45,8 +46,8 @@ export const generateReadme = async (title: string) => {
       return response.data.data.repository.issues.nodes
     })
 
-    createReadme(newIssueData[0], title)
+    createReadme(newIssueData[0])
   } catch (error) {
     console.log(error)
   }
-}
+})()

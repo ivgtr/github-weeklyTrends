@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import axios from 'axios'
+import dayjs from 'dayjs'
 
 dotenv.config()
 
@@ -60,7 +61,11 @@ const createIssueBody = (repositorys: shapeRepository, title: string): string =>
   return body
 }
 
-const createIssue = (shapeDate: shapeRepository[], title: string) => {
+const createIssue = (shapeDate: shapeRepository[]) => {
+  const day = dayjs()
+  const title = `Weekly GitHub Trending! (${day
+    .subtract(1, 'week')
+    .format('YYYY/MM/DD')} ~ ${day.format('YYYY/MM/DD')})`
   const issueBody = createIssueBody(shapeDate[0], title)
 
   return axios({
@@ -103,9 +108,9 @@ const getShapeData = (trendData: Repository[]) => {
   })
 }
 
-export const createReport = async (trendData: Repository[], title: string) => {
+export const createReport = async (trendData: Repository[]) => {
   const shapeData = await getShapeData(trendData)
-  const issueId = await createIssue(shapeData, title)
+  const issueId = await createIssue(shapeData)
   const shiftShapeData = shapeData.slice(1, 100)
   await commentIssue(shiftShapeData, issueId as string)
 }
