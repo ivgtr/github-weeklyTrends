@@ -1,8 +1,6 @@
 name: workflow get weekly GithubTrend!
 
-on:
-  schedule:
-    - cron: "0 3 * * 1"
+on: push
 
 jobs:
   working-get-GithubTrend:
