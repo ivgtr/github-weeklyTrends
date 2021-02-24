@@ -11,6 +11,21 @@ const headers = {
   Accept: 'application/vnd.github.v4.idl'
 }
 
+const closeIssue = (issueData: { id: string }) => {
+  axios({
+    url,
+    headers,
+    method: 'POST',
+    data: {
+      query: `mutation { 
+        closeIssue(input:{issueId:"${issueData.id}"}){
+          clientMutationId
+        }
+      }`
+    }
+  })
+}
+
 const createReadme = (newIssueData: { number: number; title: string }) => {
   const body = `<div align="center">
   <h3 align="center">github-weekly-trends</h3>
@@ -26,7 +41,7 @@ MIT ©[ivgtr](https://github.com/ivgtr)\n
 
 export default (async () => {
   try {
-    const newIssueData: { title: string; number: number }[] = await axios({
+    const issueData: { title: string; number: number; id: string }[] = await axios({
       url,
       headers,
       method: 'POST',
@@ -36,7 +51,8 @@ export default (async () => {
             issues(last:1){
               nodes{
                 number,
-                title
+                title,
+                id
               }
             }
           }
@@ -46,7 +62,8 @@ export default (async () => {
       return response.data.data.repository.issues.nodes
     })
 
-    createReadme(newIssueData[0])
+    createReadme(issueData[0])
+    closeIssue(issueData[2])
   } catch (error) {
     console.log(error)
   }
