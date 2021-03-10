@@ -24,3 +24,4 @@ jobs:
         env:
           TZ: Asia/Tokyo
           GITHUB_ACCESS_TOKEN: ${{ secrets.GH_TOKEN }}
+          TRANSLATE_API: ${{ secrets.TRANSLATE_API }}
