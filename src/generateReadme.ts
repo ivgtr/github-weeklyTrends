@@ -48,7 +48,7 @@ export default (async () => {
       data: {
         query: `query {
           repository(owner:"ivgtr",name:"github-weeklyTrends"){
-            issues(last:30){
+            issues(last:10,states:OPEN){
               nodes{
                 number,
                 title,
@@ -61,8 +61,10 @@ export default (async () => {
     }).then((response) => {
       return response.data.data.repository.issues.nodes
     })
-    createReadme(issueData[0])
 
+    if (issueData.length) {
+      createReadme(issueData[0])
+    }
     if (issueData.length > 2) {
       for (let i = 2; i < issueData.length; i++) {
         await closeIssue(issueData[i])
