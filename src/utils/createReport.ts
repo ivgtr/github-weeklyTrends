@@ -11,15 +11,27 @@ const headers = {
   Accept: 'application/vnd.github.v4.idl'
 }
 
-const createCommentIssueBody = (repositorys: shapeRepository): string => {
+const createCommentIssueBody = async (repositorys: shapeRepository): Promise<string> => {
+  const tranlateDescription: string[] = []
+  for (let i = 0; i < repositorys.repositorys.length; i++) {
+    await axios(process.env.TRANSLATE_API as string, {
+      params: {
+        text: repositorys.repositorys[i].description,
+        source: '',
+        target: 'ja'
+      }
+    }).then((response) => {
+      tranlateDescription.push(response.data.text)
+    })
+  }
   let body = `## ${repositorys.language || 'unknown'}\n`
 
-  repositorys.repositorys.map((repo) => {
+  repositorys.repositorys.map((repo, index) => {
     body += `### [${repo.author}](https://github.com/${repo.author}) / [${repo.name}](${
       repo.href
-    })\n${repo.description || 'Not description.'}\n\nFork:${repo.forks} / Star:${repo.stars} / +${
-      repo.starsInPeriod
-    } stars this week\n\n`
+    })\n${tranlateDescription[index] || 'Not description.'}\n\nFork:${repo.forks} / Star:${
+      repo.stars
+    } / +${repo.starsInPeriod} stars this week\n\n`
   })
 
   return body
@@ -27,7 +39,7 @@ const createCommentIssueBody = (repositorys: shapeRepository): string => {
 
 const commentIssue = async (repositorys: shapeRepository[], issueId: string) => {
   for (const repo of repositorys) {
-    const issueCommentBody = createCommentIssueBody(repo)
+    const issueCommentBody = await createCommentIssueBody(repo)
     await axios({
       url,
       headers,
@@ -44,29 +56,41 @@ const commentIssue = async (repositorys: shapeRepository[], issueId: string) => 
   console.log('complete')
 }
 
-const createIssueBody = (repositorys: shapeRepository, title: string): string => {
+const createIssueBody = async (repositorys: shapeRepository, title: string): Promise<string> => {
+  const tranlateDescription: string[] = []
+  for (let i = 0; i < repositorys.repositorys.length; i++) {
+    await axios(process.env.TRANSLATE_API as string, {
+      params: {
+        text: repositorys.repositorys[i].description,
+        source: '',
+        target: 'ja'
+      }
+    }).then((response) => {
+      tranlateDescription.push(response.data.text)
+    })
+  }
   let body = `# ${title}\n`
   body += `## ${repositorys.language || 'unknown'} trending ${
     repositorys.repositorys.length
   }repo's\n`
 
-  repositorys.repositorys.map((repo) => {
+  repositorys.repositorys.map((repo, index) => {
     body += `### [${repo.author}](https://github.com/${repo.author}) / [${repo.name}](${
       repo.href
-    })\n${repo.description || 'Not description.'}\n\nFork:${repo.forks} / Star:${repo.stars} / +${
-      repo.starsInPeriod
-    } stars this week\n\n`
+    })\n${tranlateDescription[index] || 'Not description.'}\n\nFork:${repo.forks} / Star:${
+      repo.stars
+    } / +${repo.starsInPeriod} stars this week\n\n`
   })
 
   return body
 }
 
-const createIssue = (shapeDate: shapeRepository[]) => {
+const createIssue = async (shapeDate: shapeRepository[]) => {
   const day = dayjs()
   const title = `Weekly GitHub Trending! (${day
     .subtract(1, 'week')
     .format('YYYY/MM/DD')} ~ ${day.format('YYYY/MM/DD')})`
-  const issueBody = createIssueBody(shapeDate[0], title)
+  const issueBody = await createIssueBody(shapeDate[0], title)
 
   return axios({
     url,
