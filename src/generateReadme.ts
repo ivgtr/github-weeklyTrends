@@ -48,7 +48,7 @@ export default (async () => {
       data: {
         query: `query {
           repository(owner:"ivgtr",name:"github-weeklyTrends"){
-            issues(last:10,states:OPEN){
+            issues(first:10,states:OPEN,orderBy:{field:CREATED_AT,direction:DESC}){
               nodes{
                 number,
                 title,
