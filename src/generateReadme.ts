@@ -48,7 +48,7 @@ export default (async () => {
       data: {
         query: `query {
           repository(owner:"ivgtr",name:"github-weeklyTrends"){
-            issues(first:10,states:OPEN,orderBy:{field:CREATED_AT,direction:DESC}){
+            issues(first:10,states:OPEN,orderBy:{field:CREATED_AT,direction:DESC},filterBy:{createdBy:"ivgtr"}){
               nodes{
                 number,
                 title,
@@ -68,6 +68,8 @@ export default (async () => {
         await closeIssue(issueData[i]);
       }
     }
+
+    console.log("done");
   } catch (error) {
     console.log(error);
   }
