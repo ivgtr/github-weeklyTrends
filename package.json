@@ -2,6 +2,9 @@
   "name": "github-weekly-trends",
   "version": "0.0.1",
   "main": "index.js",
+  "engines": {
+     "node": "^12.22.0 || ^14.17.0 || >=16.0.0"
+  },
   "license": "MIT",
   "scripts": {
     "start": "tsc -w",

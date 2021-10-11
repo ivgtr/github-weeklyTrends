@@ -3,13 +3,14 @@ name: generate Issue
 on:
   issues:
     types: [opened]
+  workflow_dispatch:
 
 jobs:
   working-generate-readme:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [12.x, 14.x]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@master
@@ -21,7 +22,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: generate Issue
         run: |
-          yarn
+          yarn --frozen-lockfile --non-interactive
           yarn generate
         env:
           TZ: Asia/Tokyo
