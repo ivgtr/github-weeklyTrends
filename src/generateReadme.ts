@@ -1,30 +1,30 @@
-import fs from 'fs'
-import dotenv from 'dotenv'
-import axios from 'axios'
+import axios from "axios";
+import dotenv from "dotenv";
+import fs from "fs";
 
-dotenv.config()
+dotenv.config();
 
-const url = 'https://api.github.com/graphql'
+const url = "https://api.github.com/graphql";
 
 const headers = {
   Authorization: `bearer ${process.env.GITHUB_ACCESS_TOKEN}`,
-  Accept: 'application/vnd.github.v4.idl'
-}
+  Accept: "application/vnd.github.v4.idl",
+};
 
 const closeIssue = (issueData: { id: string }) => {
   axios({
     url,
     headers,
-    method: 'POST',
+    method: "POST",
     data: {
       query: `mutation { 
         closeIssue(input:{issueId:"${issueData.id}"}){
           clientMutationId
         }
-      }`
-    }
-  })
-}
+      }`,
+    },
+  });
+};
 
 const createReadme = (newIssueData: { number: number; title: string }) => {
   const body = `<div align="center">
@@ -34,17 +34,17 @@ const createReadme = (newIssueData: { number: number; title: string }) => {
 </div>\n
 ## License\n
 MIT ©[ivgtr](https://github.com/ivgtr)\n
-[![Github Follow](https://img.shields.io/github/followers/ivgtr?style=social)](https://github.com/ivgtr) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) [![Donate](https://img.shields.io/badge/%EF%BC%84-support-green.svg?style=flat-square)](https://www.buymeacoffee.com/ivgtr)`
+[![Github Follow](https://img.shields.io/github/followers/ivgtr?style=social)](https://github.com/ivgtr) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) [![Donate](https://img.shields.io/badge/%EF%BC%84-support-green.svg?style=flat-square)](https://www.buymeacoffee.com/ivgtr)`;
 
-  fs.writeFileSync('README.md', body)
-}
+  fs.writeFileSync("README.md", body);
+};
 
 export default (async () => {
   try {
     const issueData: { title: string; number: number; id: string }[] = await axios({
       url,
       headers,
-      method: 'POST',
+      method: "POST",
       data: {
         query: `query {
           repository(owner:"ivgtr",name:"github-weeklyTrends"){
@@ -56,21 +56,19 @@ export default (async () => {
               }
             }
           }
-        }`
-      }
-    }).then((response) => {
-      return response.data.data.repository.issues.nodes
-    })
+        }`,
+      },
+    }).then((response: any) => response.data.data.repository.issues.nodes);
 
     if (issueData.length) {
-      createReadme(issueData[0])
+      createReadme(issueData[0]);
     }
     if (issueData.length > 2) {
       for (let i = 2; i < issueData.length; i++) {
-        await closeIssue(issueData[i])
+        await closeIssue(issueData[i]);
       }
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-})()
+})();

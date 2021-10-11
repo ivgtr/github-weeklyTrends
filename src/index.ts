@@ -1,11 +1,11 @@
-import { getGithubTrend } from './utils/getGithubTrend'
-import { createReport } from './utils/createReport'
+import { createReport } from "./utils/createReport";
+import { getGithubTrend } from "./utils/getGithubTrend";
 
 export default (async () => {
   try {
-    const trendData = await getGithubTrend()
-    createReport(trendData)
+    const trendData = await getGithubTrend();
+    createReport(trendData);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-})()
+})();
