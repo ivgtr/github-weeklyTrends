@@ -1,12 +1,13 @@
-name: generate Issue
+name: Generate Readme.md
 
 on:
   issues:
-    types: [opened]
+    types: [labeled]
   workflow_dispatch:
 
 jobs:
   working-generate-readme:
+    if: github.event.label.name == 'weekly-trending'
     runs-on: ubuntu-latest
     strategy:
       matrix:
