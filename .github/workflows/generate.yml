@@ -27,13 +27,14 @@ jobs:
         env:
           TZ: Asia/Tokyo
           GITHUB_ACCESS_TOKEN: ${{ secrets.GH_TOKEN }}
-      - name: git setting
-        run: |
-          git config --local user.email "ivgtr.me@gmail.com"
-          git config --local user.name "ivgtr"
       - name: commit & push
         run: |
-          git add .
-          git commit -m "updating Weekly GitHub Trending!" -a
-          git pull
-          git push origin master
+          git add -N .
+          if ! git diff --exit-code --quiet
+          then
+            git config user.name github-actions
+            git config user.email github-actions@github.com
+            git add .
+            git commit -m "updating Weekly GitHub Trending!"
+            git push
+          fi
