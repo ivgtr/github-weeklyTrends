@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [18.x]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@master
@@ -23,8 +23,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: generate Issue
         run: |
-          yarn --frozen-lockfile --non-interactive
-          yarn generate
+          npm ci
+          npm run generate
         env:
           TZ: Asia/Tokyo
           GITHUB_ACCESS_TOKEN: ${{ secrets.GH_TOKEN }}
