@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [18.x]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v3
@@ -22,5 +22,5 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Test
         run: |
-          yarn --frozen-lockfile --non-interactive
-          yarn lint
+          npm ci
+          npm run lint
