@@ -49,11 +49,11 @@ const trendingGitHub = async (period: string = "daily", language: string = "") =
       description: $(repo).find("p").text().trim() || null,
       language: $(repo).find("[itemprop=programmingLanguage]").text().trim(),
       stars: parseInt(
-        $(repo).find(`[href="${starLink}"]`).text().trim().replace(",", "") || "0",
+        $(repo).find(`[href="${starLink}"]`).text().trim().replace(/,/g, "") || "0",
         10
       ),
       forks: parseInt(
-        $(repo).find(`[href="${forkLink}"]`).text().trim().replace(",", "") || "0",
+        $(repo).find(`[href="${forkLink}"]`).text().trim().replace(/,/g, "") || "0",
         10
       ),
       starsInPeriod: parseInt(
@@ -62,7 +62,7 @@ const trendingGitHub = async (period: string = "daily", language: string = "") =
           .text()
           .trim()
           .replace(text, "")
-          .replace(",", "") || "0",
+          .replace(/,/g, "") || "0",
         10
       ),
     };
