@@ -4,7 +4,7 @@ import { getGithubTrend } from "./utils/getGithubTrend";
 export default (async () => {
   try {
     const trendData = await getGithubTrend();
-    createReport(trendData);
+    await createReport(trendData);
   } catch (error) {
     console.log(error);
   }

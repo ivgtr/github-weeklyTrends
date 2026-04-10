@@ -1,4 +1,3 @@
-import axios from "axios";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -8,15 +7,15 @@ const url = "https://api.github.com/graphql";
 const headers = {
   Authorization: `bearer ${process.env.GITHUB_ACCESS_TOKEN}`,
   Accept: "application/vnd.github.v4.idl",
+  "Content-Type": "application/json",
 };
 
 export default (async () => {
   try {
-    const issueIds: { id: string }[] = await axios({
-      url,
-      headers,
+    const issueIds: { id: string }[] = await fetch(url, {
       method: "POST",
-      data: {
+      headers,
+      body: JSON.stringify({
         query: `query {
           repository(owner:"ivgtr",name:"github-weeklyTrends"){
             issues(first:100){
@@ -26,22 +25,23 @@ export default (async () => {
             }
           }
         }`,
-      },
-    }).then((response: any) => response.data.data.repository.issues.nodes);
+      }),
+    })
+      .then((response) => response.json())
+      .then((data: any) => data.data.repository.issues.nodes);
 
     await Promise.all(
       issueIds.map(async ({ id }) => {
-        await axios({
-          url,
-          headers,
+        await fetch(url, {
           method: "POST",
-          data: {
-            query: `mutation { 
-              deleteIssue(input:{issueId:"${id}"}) { 
+          headers,
+          body: JSON.stringify({
+            query: `mutation {
+              deleteIssue(input:{issueId:"${id}"}) {
                 clientMutationId
               }
             }`,
-          },
+          }),
         });
       })
     );

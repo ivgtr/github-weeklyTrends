@@ -1,4 +1,3 @@
-import axios from "axios";
 import dotenv from "dotenv";
 import fs from "fs";
 
@@ -9,20 +8,20 @@ const url = "https://api.github.com/graphql";
 const headers = {
   Authorization: `bearer ${process.env.GITHUB_ACCESS_TOKEN}`,
   Accept: "application/vnd.github.v4.idl",
+  "Content-Type": "application/json",
 };
 
 const closeIssue = (issueData: { id: string }) => {
-  axios({
-    url,
-    headers,
+  return fetch(url, {
     method: "POST",
-    data: {
-      query: `mutation { 
+    headers,
+    body: JSON.stringify({
+      query: `mutation {
         closeIssue(input:{issueId:"${issueData.id}"}){
           clientMutationId
         }
       }`,
-    },
+    }),
   });
 };
 
@@ -41,11 +40,10 @@ MIT ©[ivgtr](https://github.com/ivgtr)\n
 
 export default (async () => {
   try {
-    const issueData: { title: string; number: number; id: string }[] = await axios({
-      url,
-      headers,
+    const issueData: { title: string; number: number; id: string }[] = await fetch(url, {
       method: "POST",
-      data: {
+      headers,
+      body: JSON.stringify({
         query: `query {
           repository(owner:"ivgtr",name:"github-weeklyTrends"){
             issues(first:10,states:OPEN,orderBy:{field:CREATED_AT,direction:DESC},filterBy:{createdBy:"ivgtr"}){
@@ -57,8 +55,10 @@ export default (async () => {
             }
           }
         }`,
-      },
-    }).then((response: any) => response.data.data.repository.issues.nodes);
+      }),
+    })
+      .then((response) => response.json())
+      .then((data: any) => data.data.repository.issues.nodes);
 
     if (issueData.length) {
       createReadme(issueData[0]);
