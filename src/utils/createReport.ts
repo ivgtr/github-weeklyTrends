@@ -15,8 +15,12 @@ const translateDescription = async (description: string | null): Promise<string>
   if (!description) return "";
   const params = new URLSearchParams({ text: description, source: "", target: "ja" });
   const response = await fetch(`${process.env.TRANSLATE_API}?${params}`);
+  if (!response.ok) {
+    console.error(`Translation failed: ${response.status}`);
+    return description;
+  }
   const data = await response.json();
-  return (data as any).text;
+  return (data as any).text ?? description;
 };
 
 const createCommentIssueBody = async (repositorys: shapeRepository): Promise<string> => {
@@ -41,17 +45,27 @@ const createCommentIssueBody = async (repositorys: shapeRepository): Promise<str
 const commentIssue = async (repositorys: shapeRepository[], issueId: string) => {
   for (const repo of repositorys) {
     const issueCommentBody = await createCommentIssueBody(repo);
-    await fetch(url, {
+    const response = await fetch(url, {
       method: "POST",
       headers,
       body: JSON.stringify({
-        query: `mutation {
-            addComment(input:{subjectId:"${issueId}",body:"${issueCommentBody}"}) {
-              clientMutationId
-            }
-          }`,
+        query: `mutation($input: AddCommentInput!) {
+          addComment(input: $input) {
+            clientMutationId
+          }
+        }`,
+        variables: {
+          input: {
+            subjectId: issueId,
+            body: issueCommentBody,
+          },
+        },
       }),
     });
+    const data = await response.json();
+    if (data.errors) {
+      console.error(`Failed to add comment for ${repo.language}:`, JSON.stringify(data.errors));
+    }
   }
   console.log("complete");
 };
@@ -78,32 +92,40 @@ const createIssueBody = async (repositorys: shapeRepository, title: string): Pro
   return body;
 };
 
-const createIssue = async (shapeDate: shapeRepository[]) => {
+const createIssue = async (shapeDate: shapeRepository[]): Promise<string> => {
   const day = dayjs();
   const title = `Weekly GitHub Trending! (${day
     .subtract(1, "week")
     .format("YYYY/MM/DD")} ~ ${day.format("YYYY/MM/DD")})`;
   const issueBody = await createIssueBody(shapeDate[0], title);
 
-  return fetch(url, {
+  const response = await fetch(url, {
     method: "POST",
     headers,
     body: JSON.stringify({
-      query: `mutation {
-        createIssue(input:{title:"${title}",repositoryId:"MDEwOlJlcG9zaXRvcnkzMzE4ODM4MTE=",labelIds:"MDU6TGFiZWwyNjg3OTE1Nzgy",body:"${issueBody}"}) {
+      query: `mutation($input: CreateIssueInput!) {
+        createIssue(input: $input) {
           issue {
-            body,
             id
           }
         }
       }`,
+      variables: {
+        input: {
+          title,
+          repositoryId: "MDEwOlJlcG9zaXRvcnkzMzE4ODM4MTE=",
+          labelIds: ["MDU6TGFiZWwyNjg3OTE1Nzgy"],
+          body: issueBody,
+        },
+      },
     }),
-  })
-    .then((res) => res.json())
-    .then((data: any) => data.data.createIssue.issue.id)
-    .catch((err) => {
-      console.log(err);
-    });
+  });
+
+  const data = await response.json();
+  if (data.errors) {
+    throw new Error(`Failed to create issue: ${JSON.stringify(data.errors)}`);
+  }
+  return data.data.createIssue.issue.id;
 };
 
 const getShapeData = (trendData: Repository[]) => {
@@ -122,8 +144,11 @@ const getShapeData = (trendData: Repository[]) => {
 };
 
 export const createReport = async (trendData: Repository[]) => {
-  const shapeData = await getShapeData(trendData);
+  if (trendData.length === 0) {
+    throw new Error("No trending data fetched");
+  }
+  const shapeData = getShapeData(trendData);
   const issueId = await createIssue(shapeData);
   const shiftShapeData = shapeData.slice(1, 100);
-  await commentIssue(shiftShapeData, issueId as string);
+  await commentIssue(shiftShapeData, issueId);
 };

@@ -6,6 +6,7 @@ export default (async () => {
     const trendData = await getGithubTrend();
     await createReport(trendData);
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    process.exit(1);
   }
 })();
