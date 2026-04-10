@@ -1,4 +1,3 @@
-import axios from "axios";
 import dayjs from "dayjs";
 import dotenv from "dotenv";
 
@@ -9,20 +8,22 @@ const url = "https://api.github.com/graphql";
 const headers = {
   Authorization: `bearer ${process.env.GITHUB_ACCESS_TOKEN}`,
   Accept: "application/vnd.github.v4.idl",
+  "Content-Type": "application/json",
+};
+
+const translateDescription = async (description: string | null): Promise<string> => {
+  if (!description) return "";
+  const params = new URLSearchParams({ text: description, source: "", target: "ja" });
+  const response = await fetch(`${process.env.TRANSLATE_API}?${params}`);
+  const data = await response.json();
+  return (data as any).text;
 };
 
 const createCommentIssueBody = async (repositorys: shapeRepository): Promise<string> => {
   const tranlateDescription: string[] = [];
   for (let i = 0; i < repositorys.repositorys.length; i++) {
-    await axios(process.env.TRANSLATE_API as string, {
-      params: {
-        text: repositorys.repositorys[i].description,
-        source: "",
-        target: "ja",
-      },
-    }).then((response: any) => {
-      tranlateDescription.push(response.data.text);
-    });
+    const text = await translateDescription(repositorys.repositorys[i].description);
+    tranlateDescription.push(text);
   }
   let body = `## ${repositorys.language || "unknown"}\n`;
 
@@ -40,17 +41,16 @@ const createCommentIssueBody = async (repositorys: shapeRepository): Promise<str
 const commentIssue = async (repositorys: shapeRepository[], issueId: string) => {
   for (const repo of repositorys) {
     const issueCommentBody = await createCommentIssueBody(repo);
-    await axios({
-      url,
-      headers,
+    await fetch(url, {
       method: "POST",
-      data: {
+      headers,
+      body: JSON.stringify({
         query: `mutation {
             addComment(input:{subjectId:"${issueId}",body:"${issueCommentBody}"}) {
               clientMutationId
             }
           }`,
-      },
+      }),
     });
   }
   console.log("complete");
@@ -59,15 +59,8 @@ const commentIssue = async (repositorys: shapeRepository[], issueId: string) => 
 const createIssueBody = async (repositorys: shapeRepository, title: string): Promise<string> => {
   const tranlateDescription: string[] = [];
   for (let i = 0; i < repositorys.repositorys.length; i++) {
-    await axios(process.env.TRANSLATE_API as string, {
-      params: {
-        text: repositorys.repositorys[i].description,
-        source: "",
-        target: "ja",
-      },
-    }).then((response: any) => {
-      tranlateDescription.push(response.data.text);
-    });
+    const text = await translateDescription(repositorys.repositorys[i].description);
+    tranlateDescription.push(text);
   }
   let body = `# ${title}\n`;
   body += `## ${repositorys.language || "unknown"} trending ${
@@ -92,11 +85,10 @@ const createIssue = async (shapeDate: shapeRepository[]) => {
     .format("YYYY/MM/DD")} ~ ${day.format("YYYY/MM/DD")})`;
   const issueBody = await createIssueBody(shapeDate[0], title);
 
-  return axios({
-    url,
-    headers,
+  return fetch(url, {
     method: "POST",
-    data: {
+    headers,
+    body: JSON.stringify({
       query: `mutation {
         createIssue(input:{title:"${title}",repositoryId:"MDEwOlJlcG9zaXRvcnkzMzE4ODM4MTE=",labelIds:"MDU6TGFiZWwyNjg3OTE1Nzgy",body:"${issueBody}"}) {
           issue {
@@ -105,9 +97,10 @@ const createIssue = async (shapeDate: shapeRepository[]) => {
           }
         }
       }`,
-    },
+    }),
   })
-    .then((res: any) => res.data.data.createIssue.issue.id)
+    .then((res) => res.json())
+    .then((data: any) => data.data.createIssue.issue.id)
     .catch((err) => {
       console.log(err);
     });
