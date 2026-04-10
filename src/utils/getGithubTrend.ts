@@ -32,7 +32,7 @@ const trendingGitHub = (period: string = "daily", language: string = "") =>
           const name = title.split("/")[1];
 
           const starLink = `/${title.replace(/ /g, "")}/stargazers`;
-          const forkLink = `/${title.replace(/ /g, "")}/network/members.${name}`;
+          const forkLink = `/${title.replace(/ /g, "")}/forks`;
 
           let text = "";
           if (period === "daily") {
@@ -51,11 +51,11 @@ const trendingGitHub = (period: string = "daily", language: string = "") =>
             language: $(repo).find("[itemprop=programmingLanguage]").text().trim(),
             stars: parseInt(
               $(repo).find(`[href="${starLink}"]`).text().trim().replace(",", "") || "0",
-              0
+              10
             ),
             forks: parseInt(
               $(repo).find(`[href="${forkLink}"]`).text().trim().replace(",", "") || "0",
-              0
+              10
             ),
             starsInPeriod: parseInt(
               $(repo)
@@ -64,7 +64,7 @@ const trendingGitHub = (period: string = "daily", language: string = "") =>
                 .trim()
                 .replace(text, "")
                 .replace(",", "") || "0",
-              0
+              10
             ),
           };
 

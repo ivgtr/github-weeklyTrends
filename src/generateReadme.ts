@@ -12,7 +12,7 @@ const headers = {
 };
 
 const closeIssue = (issueData: { id: string }) => {
-  axios({
+  return axios({
     url,
     headers,
     method: "POST",
