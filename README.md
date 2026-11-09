@@ -1,7 +1,7 @@
 <div align="center">
   <h3 align="center">github-weekly-trends</h3>
   <p align="center">Get Github weekly trends, and output Issue in this repository.</p>
-  <a align="center" href="https://github.com/ivgtr/github-weeklyTrends/issues/471" target="_brank">Weekly GitHub Trending! (2026/10/26 ~ 2026/11/02)</a>
+  <a align="center" href="https://github.com/ivgtr/github-weeklyTrends/issues/472" target="_brank">Weekly GitHub Trending! (2026/11/02 ~ 2026/11/09)</a>
 </div>
 
 ## License
